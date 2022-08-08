@@ -1,0 +1,195 @@
+@use "sass:map";
+
+$theme-colors: (
+  "text": #faf6e9,
+  "background": #414141,
+  "accent": #313131,
+  "primary": #2f2749,
+  "warning": #ff5c5c,
+);
+
+$breakpoints: (
+  "mobile": 640px,
+  "tablet": 1024px,
+  "small": 1280px,
+);
+
+@mixin breakpoint($name) {
+  @media (max-width: map.get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  @each $name, $value in $theme-colors {
+    --theme-#{$name}: #{$value};
+  }
+}
+
+body {
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  font-family: "Roboto", sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: var(--theme-text);
+  text-decoration: none;
+}
+
+.progress-ring circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.navbar {
+  width: 100%;
+  height: 5rem;
+  background-color: var(--theme-primary);
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 0 1rem;
+
+  > .navbar-item {
+    flex: 1;
+  }
+}
+
+.dashboard {
+  $dashboard-section-bg-color: var(--theme-accent);
+  $dashboard-section-margin: 1rem;
+  $dashboard-section-border-radius: 10px;
+
+  > section {
+    background-color: $dashboard-section-bg-color;
+    border-radius: $dashboard-section-border-radius;
+    padding: 2rem;
+    margin: $dashboard-section-margin;
+  }
+
+  h2 {
+    // width: min-content;
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 1rem;
+    background-color: $dashboard-section-bg-color;
+    margin: $dashboard-section-margin;
+    margin-bottom: 0;
+    border-top-left-radius: $dashboard-section-border-radius;
+    border-top-right-radius: $dashboard-section-border-radius;
+    border-bottom: 2px dashed var(--theme-text);
+    text-align: center;
+
+    + section {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      margin-top: 0;
+    }
+  }
+
+  .cpu {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+
+    // Tablets
+    @include breakpoint("tablet") {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    // Mobile devices
+    @include breakpoint("mobile") {
+      display: block;
+    }
+  }
+}
+
+.memory-usage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "used allocated total"
+    "bar bar bar";
+  gap: 0;
+
+  > .memory-usage-used {
+    grid-area: used;
+  }
+
+  > .memory-usage-allocated {
+    grid-area: allocated;
+    text-align: center;
+  }
+
+  > .memory-usage-total {
+    grid-area: total;
+    text-align: right;
+  }
+
+  > .memory-usage-bar {
+    grid-area: bar;
+  }
+}
+
+.cpu-usage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "name frequency"
+    "bar bar"
+    "usage usage";
+  gap: 0;
+
+  > .cpu-usage-name {
+    grid-area: name;
+    font-weight: bold;
+  }
+
+  > .cpu-usage-frequency {
+    grid-area: frequency;
+    text-align: right;
+  }
+
+  > .cpu-usage-bar {
+    grid-area: bar;
+  }
+
+  > .cpu-usage-usage {
+    grid-area: usage;
+    text-align: center;
+  }
+}
+
+.meter {
+  height: 1em;
+  position: relative;
+  background: #555;
+  border-radius: 5px;
+
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background-color: var(--theme-primary);
+    position: relative;
+    overflow: hidden;
+    transition: width 0.5s ease-in-out;
+  }
+
+  @each $name in map.keys($theme-colors) {
+    &.#{$name} {
+      background-color: var(--theme-#{$name});
+    }
+  }
+}

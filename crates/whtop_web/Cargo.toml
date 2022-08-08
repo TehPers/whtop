@@ -1,0 +1,27 @@
+[package]
+name = "whtop_web"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# Common
+whtop_common = { path = "../whtop_common" }
+# Frontend
+yew = "0.19"
+yew-router = "0.16"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+gloo = "0.8"
+gloo-utils = "0.1"
+web-sys = {version = "0.3",features=["Headers", "Request", "RequestInit", "RequestMode", "Response", "Window"]}
+# Serialization
+serde = "1"
+# Futures
+futures = "0.3"
+
+[profile.release]
+opt-level = "z"
+codegen-units = 1
+lto = "thin"
+panic = "abort"
