@@ -22,19 +22,27 @@ $breakpoints: (
 
 * {
   box-sizing: border-box;
-  @each $name, $value in $theme-colors {
+
+  @each $name,
+  $value in $theme-colors {
     --theme-#{$name}: #{$value};
   }
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 body {
+  margin: 0;
+  min-height: 100%;
   background-color: var(--theme-background);
   color: var(--theme-text);
   font-family: "Roboto", sans-serif;
   font-size: 1.2rem;
   line-height: 1.5;
-  margin: 0;
-  padding: 0;
 }
 
 a {
@@ -57,7 +65,7 @@ a {
   align-items: center;
   padding: 0 1rem;
 
-  > .navbar-item {
+  >.navbar-item {
     flex: 1;
   }
 }
@@ -67,11 +75,12 @@ a {
   $dashboard-section-margin: 1rem;
   $dashboard-section-border-radius: 10px;
 
-  > section {
+  padding: 1rem;
+
+  >section {
     background-color: $dashboard-section-bg-color;
     border-radius: $dashboard-section-border-radius;
     padding: 2rem;
-    margin: $dashboard-section-margin;
   }
 
   h2 {
@@ -80,14 +89,17 @@ a {
     font-weight: bold;
     padding: 1rem;
     background-color: $dashboard-section-bg-color;
-    margin: $dashboard-section-margin;
-    margin-bottom: 0;
+    margin: 0;
     border-top-left-radius: $dashboard-section-border-radius;
     border-top-right-radius: $dashboard-section-border-radius;
-    border-bottom: 2px dashed var(--theme-text);
+    // border-bottom: 2px solid var(--theme-text);
     text-align: center;
 
-    + section {
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+
+    +section {
       border-top-left-radius: 0;
       border-top-right-radius: 0;
       margin-top: 0;
@@ -111,6 +123,29 @@ a {
   }
 }
 
+.meter {
+  height: 1em;
+  position: relative;
+  background: #555;
+  border-radius: 5px;
+
+  >span {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background-color: var(--theme-primary);
+    position: relative;
+    overflow: hidden;
+    transition: width 0.5s ease-in-out;
+  }
+
+  @each $name in map.keys($theme-colors) {
+    &.#{$name} {
+      background-color: var(--theme-#{$name});
+    }
+  }
+}
+
 .memory-usage {
   width: 100%;
   display: grid;
@@ -121,21 +156,21 @@ a {
     "bar bar bar";
   gap: 0;
 
-  > .memory-usage-used {
+  >.memory-usage-used {
     grid-area: used;
   }
 
-  > .memory-usage-allocated {
+  >.memory-usage-allocated {
     grid-area: allocated;
     text-align: center;
   }
 
-  > .memory-usage-total {
+  >.memory-usage-total {
     grid-area: total;
     text-align: right;
   }
 
-  > .memory-usage-bar {
+  >.memory-usage-bar {
     grid-area: bar;
   }
 }
@@ -151,45 +186,52 @@ a {
     "usage usage";
   gap: 0;
 
-  > .cpu-usage-name {
+  >.cpu-usage-name {
     grid-area: name;
     font-weight: bold;
   }
 
-  > .cpu-usage-frequency {
+  >.cpu-usage-frequency {
     grid-area: frequency;
     text-align: right;
   }
 
-  > .cpu-usage-bar {
+  >.cpu-usage-bar {
     grid-area: bar;
   }
 
-  > .cpu-usage-usage {
+  >.cpu-usage-usage {
     grid-area: usage;
     text-align: center;
   }
 }
 
-.meter {
-  height: 1em;
-  position: relative;
-  background: #555;
-  border-radius: 5px;
+.process-list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
 
-  > span {
-    display: block;
-    height: 100%;
-    border-radius: 5px;
-    background-color: var(--theme-primary);
-    position: relative;
-    overflow: hidden;
-    transition: width 0.5s ease-in-out;
-  }
+  >.process-list-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--theme-text);
 
-  @each $name in map.keys($theme-colors) {
-    &.#{$name} {
-      background-color: var(--theme-#{$name});
+    >* {
+      flex: 1;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+
+    >.process-list-row-cpu {
+      flex: 3;
+    }
+
+    >.process-list-row-memory {
+      flex: 3;
     }
   }
 }

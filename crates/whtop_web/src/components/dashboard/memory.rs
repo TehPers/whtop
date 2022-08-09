@@ -1,18 +1,19 @@
 use crate::components::Meter;
-use whtop_common::models::api::GetMemoryResponse;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Debug, Properties)]
 pub struct MemoryUsageProps {
-    pub memory_stats: GetMemoryResponse,
+    pub memory_total: u64,
+    pub memory_used: u64,
+    pub memory_available: u64,
 }
 
 #[function_component(MemoryUsage)]
 pub fn memory_usage(props: &MemoryUsageProps) -> Html {
-    let used = format_unit(props.memory_stats.used);
-    let allocated = format_unit(props.memory_stats.total - props.memory_stats.available);
-    let total = format_unit(props.memory_stats.total);
-    let progress = props.memory_stats.used as f64 / props.memory_stats.total as f64;
+    let used = format_unit(props.memory_used);
+    let allocated = format_unit(props.memory_total - props.memory_available);
+    let total = format_unit(props.memory_total);
+    let progress = props.memory_used as f64 / props.memory_total as f64;
     html! {
         <div class={"memory-usage"}>
             <div class={"memory-usage-used"}>{used}{" used"}</div>
