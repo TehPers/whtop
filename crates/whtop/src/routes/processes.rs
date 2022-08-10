@@ -23,7 +23,8 @@ async fn get_processes(Extension(system): Extension<Arc<RwLock<System>>>) -> imp
 }
 
 fn create_response(system: &System) -> GetProcessesResponse {
-    let mut processes: Vec<ProcessInfo> = system.processes().iter().map(create_process_info).collect();
+    let mut processes: Vec<ProcessInfo> =
+        system.processes().iter().map(create_process_info).collect();
     processes.sort_unstable_by_key(|process| Reverse(process.memory));
     GetProcessesResponse { processes }
 }

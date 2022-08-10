@@ -2,7 +2,7 @@ use axum::{body::HttpBody, response::IntoResponse, routing::MethodRouter, Extens
 use std::sync::Arc;
 use sysinfo::{Cpu, CpuExt, System, SystemExt};
 use tokio::sync::RwLock;
-use whtop_common::models::api::{GetCpuResponse, CpuInfo, GlobalCpuInfo};
+use whtop_common::models::api::{CpuInfo, GetCpuResponse, GlobalCpuInfo};
 
 pub fn cpu<B>() -> MethodRouter<B>
 where

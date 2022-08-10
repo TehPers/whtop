@@ -1,8 +1,8 @@
 mod config;
 mod errors;
+mod layers;
 mod routes;
 mod startup;
-mod layers;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
