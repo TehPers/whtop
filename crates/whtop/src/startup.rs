@@ -1,11 +1,14 @@
 use crate::{config::AppConfig, layers::RefreshSystemLayer};
 use anyhow::Context;
-use axum::{body::HttpBody, http::HeaderValue, Extension, Router};
+use axum::{body::HttpBody, Extension, Router};
 use std::{sync::Arc, time::Duration};
-use sysinfo::{System, SystemExt};
+use sysinfo::{CpuRefreshKind, ProcessRefreshKind, RefreshKind, System, SystemExt};
 use tokio::sync::RwLock;
 use tower::ServiceBuilder;
-use tower_http::{set_header::SetResponseHeaderLayer, trace::TraceLayer};
+use tower_http::{
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
 use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -43,7 +46,13 @@ where
     B: HttpBody + Send + 'static,
 {
     // Create system info tracker
-    let system = Arc::new(RwLock::new(System::new_all()));
+    let system = System::new_with_specifics(
+        RefreshKind::new()
+            .with_cpu(CpuRefreshKind::everything())
+            .with_memory()
+            .with_processes(ProcessRefreshKind::everything()),
+    );
+    let system = Arc::new(RwLock::new(system));
     Router::new()
         .route("/cpu", crate::routes::cpu())
         .route("/memory", crate::routes::memory())
@@ -55,10 +64,7 @@ where
                     system.clone(),
                     Duration::from_secs_f32(config.refresh_rate_secs),
                 ))
-                .layer(SetResponseHeaderLayer::if_not_present(
-                    hyper::header::ACCESS_CONTROL_ALLOW_ORIGIN,
-                    HeaderValue::from_static("*"),
-                ))
+                .layer(CorsLayer::new().allow_origin(Any))
                 .layer(Extension(system))
                 .layer(Extension(config)),
         )

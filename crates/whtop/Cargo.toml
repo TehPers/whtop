@@ -17,12 +17,16 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 axum = { version = "0.5", default-features = false, features = [
     "http1",
     "http2",
-    "json"
+    "json",
 ] }
 tokio = { version = "1", features = ["full"] }
 hyper = { version = "0.14", features = ["full"] }
 tower = "0.4"
-tower-http = { version = "0.3", features = ["trace", "util", "set-header"] }
+tower-http = { version = "0.3", features = [
+    "cors",
+    "trace",
+    "util",
+] }
 futures = "0.3"
 # Serialization
 serde = { version = "1", features = ["derive"] }
