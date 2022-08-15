@@ -56,6 +56,8 @@ args = [
     "RUST_LOG=debug,hyper=info",
     "-e",
     "WHTOP_ADDRESS=0.0.0.0:8080",
+    "-e",
+    "SYSINFO_PROC_PATH=/host/proc",
     "whtop",
 ]
 

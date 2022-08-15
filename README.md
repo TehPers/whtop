@@ -63,4 +63,6 @@ docker compose up
 
 ## License
 
-This code is licensed under your choice of either [MIT](./LICENSE-MIT) or [Apache 2.0](./LICENSE-APACHE).
+This code is licensed under your choice of either [MIT](./LICENSE-MIT) or [Apache 2.0](./LICENSE-APACHE), except for:
+
+- The code under [`backend/sysinfo`](backend/sysinfo/) ([License - MIT](./backend/sysinfo/LICENSE)).

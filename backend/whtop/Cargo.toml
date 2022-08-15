@@ -29,7 +29,7 @@ futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 envy = "0.4"
 # System
-sysinfo = "0.25"
+sysinfo = { version = "0.25", path = "../sysinfo" } # need to read from /host/proc
 
 [profile.release]
 opt-level = 3

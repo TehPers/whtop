@@ -7,6 +7,6 @@ services:
     environment:
       RUST_LOG: "debug,hyper=info"
       WHTOP_ADDRESS: "0.0.0.0:8080"
+      SYSINFO_PROC_PATH: "/host/proc"
     volumes:
       - /proc:/host/proc:ro
-
