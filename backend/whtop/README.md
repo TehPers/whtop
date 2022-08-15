@@ -17,3 +17,4 @@ This service can be configured via environment variables:
 - `RUST_LOG`: Configures the log level for the service. See the docs for [`tracing_subscriber::EnvFilter`](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives) for more information.
 - `WHTOP_ADDRESS`: The server address, including the port. For example: `0.0.0.0:8081`.
 - `WHTOP_REFRESH_RATE_SECS`: The system info refresh rate. This is the minimum delay between system info updates.
+- `WHTOP_STATIC_DIR`: The path to the static files directory.

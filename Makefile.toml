@@ -39,6 +39,9 @@ command = "docker"
 args = [
     "run",
     "--rm",
+    "-d",
+    "--name",
+    "whtop",
     "-v",
     "/proc:/host/proc:ro",
     "-p",
@@ -49,3 +52,11 @@ args = [
     "WHTOP_ADDRESS=0.0.0.0:8080",
     "whtop",
 ]
+
+[tasks.monitor-docker]
+command = "docker"
+args = ["logs", "-f", "whtop"]
+
+[tasks.stop-docker]
+command = "docker"
+args = ["stop", "whtop"]
