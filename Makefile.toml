@@ -20,7 +20,7 @@ args = ["serve"]
 env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
 
 [tasks.build-backend]
-cwd = "./backend/whtop_api/"
+cwd = "./backend/whtop/"
 command = "cargo"
 args = ["build", "--bin", "whtop"]
 
