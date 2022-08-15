@@ -1,5 +1,12 @@
 [config]
 default_to_workspace = false
+skip_core_tasks = true
+
+[tasks.build]
+run_task = { name = [
+    "build-backend",
+    "build-frontend",
+], fork = true, parallel = true }
 
 [tasks.run]
 run_task = { name = [
@@ -10,8 +17,7 @@ run_task = { name = [
 [tasks.build-frontend]
 cwd = "./frontend/whtop_web/"
 command = "trunk"
-args = ["serve"]
-env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
+args = ["build"]
 
 [tasks.run-frontend]
 cwd = "./frontend/whtop_web/"
