@@ -1,0 +1,39 @@
+[package]
+name = "whtop"
+description = "A simple server monitoring tool"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# Common
+whtop_common = { path = "../../shared/whtop_common" }
+# Error handling
+anyhow = "1"
+# Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Web server
+axum = { version = "0.5", default-features = false, features = [
+    "http1",
+    "http2",
+    "json",
+] }
+axum-extra = { version = "0.3", features = ["spa"] }
+tokio = { version = "1", features = ["full"] }
+hyper = { version = "0.14", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.3", features = ["cors", "trace", "util"] }
+futures = "0.3"
+# Serialization
+serde = { version = "1", features = ["derive"] }
+envy = "0.4"
+# System
+sysinfo = "0.25"
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "thin"
+strip = true
+panic = "abort"

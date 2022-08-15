@@ -1,0 +1,51 @@
+[config]
+default_to_workspace = false
+
+[tasks.run]
+run_task = { name = [
+    "run-backend",
+    "run-frontend",
+], fork = true, parallel = true }
+
+[tasks.build-frontend]
+cwd = "./frontend/whtop_web/"
+command = "trunk"
+args = ["serve"]
+env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
+
+[tasks.run-frontend]
+cwd = "./frontend/whtop_web/"
+command = "trunk"
+args = ["serve"]
+env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
+
+[tasks.build-backend]
+cwd = "./backend/whtop_api/"
+command = "cargo"
+args = ["build", "--bin", "whtop"]
+
+[tasks.run-backend]
+cwd = "./backend/whtop/"
+command = "cargo"
+args = ["run", "--bin", "whtop"]
+env = { RUST_LOG = "debug,hyper=info", WHTOP_ADDRESS = "0.0.0.0:8081" }
+
+[tasks.build-docker]
+command = "docker"
+args = ["build", "-t", "whtop", "."]
+
+[tasks.run-docker]
+command = "docker"
+args = [
+    "run",
+    "--rm",
+    "-v",
+    "/proc:/host/proc:ro",
+    "-p",
+    "8080:8080",
+    "-e",
+    "RUST_LOG=debug,hyper=info",
+    "-e",
+    "WHTOP_ADDRESS=0.0.0.0:8080",
+    "whtop",
+]
