@@ -14,6 +14,12 @@ run_task = { name = [
     "run-frontend",
 ], fork = true, parallel = true }
 
+[tasks.clean]
+run_task = { name = [
+    "clean-backend",
+    "clean-frontend",
+], fork = true, parallel = true }
+
 [tasks.build-frontend]
 cwd = "./frontend/whtop_web/"
 command = "trunk"
@@ -25,6 +31,11 @@ command = "trunk"
 args = ["serve"]
 env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
 
+[tasks.clean-frontend]
+cwd = "./frontend/whtop_web/"
+command = "trunk"
+args = ["clean"]
+
 [tasks.build-backend]
 cwd = "./backend/whtop/"
 command = "cargo"
@@ -35,6 +46,11 @@ cwd = "./backend/whtop/"
 command = "cargo"
 args = ["run", "--bin", "whtop"]
 env = { RUST_LOG = "debug,hyper=info", WHTOP_ADDRESS = "0.0.0.0:8081" }
+
+[tasks.clean-backend]
+cwd = "./backend/whtop/"
+command = "cargo"
+args = ["clean"]
 
 [tasks.build-docker]
 command = "docker"
