@@ -23,7 +23,14 @@ axum-extra = { version = "0.3", features = ["spa"] }
 tokio = { version = "1", features = ["full"] }
 hyper = { version = "0.14", features = ["full"] }
 tower = { version = "0.4", features = ["retry", "timeout", "util"] }
-tower-http = { version = "0.3", features = ["cors", "trace", "util"] }
+tower-http = { version = "0.3", features = [
+    "cors",
+    "trace",
+    "util",
+    "compression-br",
+    "compression-deflate",
+    "compression-gzip",
+] }
 futures = "0.3"
 # Serialization
 serde = { version = "1", features = ["derive"] }
