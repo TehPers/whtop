@@ -1,14 +1,14 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::utils::get_all_data;
-use crate::{utils, DiskExt, DiskType};
+use crate::{sys::utils::get_all_data, utils, DiskExt, DiskType};
 
 use libc::statvfs;
-use std::ffi::{OsStr, OsString};
-use std::fs;
-use std::mem;
-use std::os::unix::ffi::OsStrExt;
-use std::path::{Path, PathBuf};
+use std::{
+    ffi::{OsStr, OsString},
+    fs, mem,
+    os::unix::ffi::OsStrExt,
+    path::{Path, PathBuf},
+};
 
 macro_rules! cast {
     ($x:expr) => {

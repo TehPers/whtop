@@ -1,21 +1,27 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::{ffi, utils};
-use crate::utils::to_cpath;
-use crate::{Disk, DiskType};
+use crate::{
+    sys::{ffi, utils},
+    utils::to_cpath,
+    Disk, DiskType,
+};
 
-use core_foundation_sys::base::{kCFAllocatorDefault, kCFAllocatorNull, CFRelease};
-use core_foundation_sys::dictionary::{CFDictionaryGetValueIfPresent, CFDictionaryRef};
-use core_foundation_sys::number::{kCFBooleanTrue, CFBooleanRef};
-use core_foundation_sys::string as cfs;
+use core_foundation_sys::{
+    base::{kCFAllocatorDefault, kCFAllocatorNull, CFRelease},
+    dictionary::{CFDictionaryGetValueIfPresent, CFDictionaryRef},
+    number::{kCFBooleanTrue, CFBooleanRef},
+    string as cfs,
+};
 
 use libc::{c_char, c_int, c_void, statfs};
 
-use std::ffi::{OsStr, OsString};
-use std::mem;
-use std::os::unix::ffi::OsStrExt;
-use std::path::PathBuf;
-use std::ptr;
+use std::{
+    ffi::{OsStr, OsString},
+    mem,
+    os::unix::ffi::OsStrExt,
+    path::PathBuf,
+    ptr,
+};
 
 fn to_path(mount_path: &[c_char]) -> Option<PathBuf> {
     let mut tmp = Vec::with_capacity(mount_path.len());

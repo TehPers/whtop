@@ -1,55 +1,64 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::utils::to_str;
-use crate::{DiskUsage, Gid, Pid, ProcessExt, ProcessRefreshKind, ProcessStatus, Signal, Uid};
+use crate::{
+    sys::utils::to_str, DiskUsage, Gid, Pid, ProcessExt, ProcessRefreshKind, ProcessStatus, Signal,
+    Uid,
+};
 
-use std::ffi::OsString;
-use std::fmt;
-use std::mem::{size_of, zeroed, MaybeUninit};
-use std::ops::Deref;
-use std::os::windows::ffi::OsStringExt;
-use std::os::windows::process::CommandExt;
-use std::path::{Path, PathBuf};
-use std::process;
-use std::ptr::null_mut;
-use std::str;
-use std::sync::Arc;
+use std::{
+    ffi::OsString,
+    fmt,
+    mem::{size_of, zeroed, MaybeUninit},
+    ops::Deref,
+    os::windows::{ffi::OsStringExt, process::CommandExt},
+    path::{Path, PathBuf},
+    process,
+    ptr::null_mut,
+    str,
+    sync::Arc,
+};
 
 use libc::{c_void, memcpy};
 
-use ntapi::ntpebteb::PEB;
-use ntapi::ntwow64::{PEB32, PRTL_USER_PROCESS_PARAMETERS32, RTL_USER_PROCESS_PARAMETERS32};
+use ntapi::{
+    ntpebteb::PEB,
+    ntwow64::{PEB32, PRTL_USER_PROCESS_PARAMETERS32, RTL_USER_PROCESS_PARAMETERS32},
+};
 use once_cell::sync::Lazy;
 
-use ntapi::ntpsapi::{
-    NtQueryInformationProcess, ProcessBasicInformation, ProcessCommandLineInformation,
-    ProcessWow64Information, PROCESSINFOCLASS, PROCESS_BASIC_INFORMATION,
+use ntapi::{
+    ntpsapi::{
+        NtQueryInformationProcess, ProcessBasicInformation, ProcessCommandLineInformation,
+        ProcessWow64Information, PROCESSINFOCLASS, PROCESS_BASIC_INFORMATION,
+    },
+    ntrtl::{RtlGetVersion, PRTL_USER_PROCESS_PARAMETERS, RTL_USER_PROCESS_PARAMETERS},
 };
-use ntapi::ntrtl::{RtlGetVersion, PRTL_USER_PROCESS_PARAMETERS, RTL_USER_PROCESS_PARAMETERS};
-use winapi::shared::basetsd::SIZE_T;
-use winapi::shared::minwindef::{DWORD, FALSE, FILETIME, LPVOID, MAX_PATH, TRUE, ULONG};
-use winapi::shared::ntdef::{NT_SUCCESS, UNICODE_STRING};
-use winapi::shared::ntstatus::{
-    STATUS_BUFFER_OVERFLOW, STATUS_BUFFER_TOO_SMALL, STATUS_INFO_LENGTH_MISMATCH,
-};
-use winapi::shared::winerror::ERROR_INSUFFICIENT_BUFFER;
-use winapi::um::errhandlingapi::GetLastError;
-use winapi::um::handleapi::CloseHandle;
-use winapi::um::heapapi::{GetProcessHeap, HeapAlloc, HeapFree};
-use winapi::um::memoryapi::{ReadProcessMemory, VirtualQueryEx};
-use winapi::um::processthreadsapi::{
-    GetProcessTimes, GetSystemTimes, OpenProcess, OpenProcessToken,
-};
-use winapi::um::psapi::{
-    EnumProcessModulesEx, GetModuleBaseNameW, GetModuleFileNameExW, GetProcessMemoryInfo,
-    LIST_MODULES_ALL, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX,
-};
-use winapi::um::securitybaseapi::GetTokenInformation;
-use winapi::um::winbase::{GetProcessIoCounters, CREATE_NO_WINDOW};
-use winapi::um::winnt::{
-    TokenUser, HANDLE, HEAP_ZERO_MEMORY, IO_COUNTERS, MEMORY_BASIC_INFORMATION,
-    PROCESS_QUERY_INFORMATION, PROCESS_QUERY_LIMITED_INFORMATION, PROCESS_VM_READ,
-    RTL_OSVERSIONINFOEXW, TOKEN_QUERY, TOKEN_USER, ULARGE_INTEGER,
+use winapi::{
+    shared::{
+        basetsd::SIZE_T,
+        minwindef::{DWORD, FALSE, FILETIME, LPVOID, MAX_PATH, TRUE, ULONG},
+        ntdef::{NT_SUCCESS, UNICODE_STRING},
+        ntstatus::{STATUS_BUFFER_OVERFLOW, STATUS_BUFFER_TOO_SMALL, STATUS_INFO_LENGTH_MISMATCH},
+        winerror::ERROR_INSUFFICIENT_BUFFER,
+    },
+    um::{
+        errhandlingapi::GetLastError,
+        handleapi::CloseHandle,
+        heapapi::{GetProcessHeap, HeapAlloc, HeapFree},
+        memoryapi::{ReadProcessMemory, VirtualQueryEx},
+        processthreadsapi::{GetProcessTimes, GetSystemTimes, OpenProcess, OpenProcessToken},
+        psapi::{
+            EnumProcessModulesEx, GetModuleBaseNameW, GetModuleFileNameExW, GetProcessMemoryInfo,
+            LIST_MODULES_ALL, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX,
+        },
+        securitybaseapi::GetTokenInformation,
+        winbase::{GetProcessIoCounters, CREATE_NO_WINDOW},
+        winnt::{
+            TokenUser, HANDLE, HEAP_ZERO_MEMORY, IO_COUNTERS, MEMORY_BASIC_INFORMATION,
+            PROCESS_QUERY_INFORMATION, PROCESS_QUERY_LIMITED_INFORMATION, PROCESS_VM_READ,
+            RTL_OSVERSIONINFOEXW, TOKEN_QUERY, TOKEN_USER, ULARGE_INTEGER,
+        },
+    },
 };
 
 impl fmt::Display for ProcessStatus {

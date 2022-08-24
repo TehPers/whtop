@@ -2,10 +2,12 @@
 
 use crate::ComponentExt;
 
-use std::collections::HashMap;
-use std::fs::{metadata, read_dir, File};
-use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    fs::{metadata, read_dir, File},
+    io::Read,
+    path::{Path, PathBuf},
+};
 
 #[doc = include_str!("../../md_doc/component.md")]
 pub struct Component {

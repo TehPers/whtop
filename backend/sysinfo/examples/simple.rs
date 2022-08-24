@@ -5,11 +5,12 @@
 
 extern crate sysinfo;
 
-use std::io::{self, BufRead, Write};
-use std::str::FromStr;
-use sysinfo::Signal::*;
+use std::{
+    io::{self, BufRead, Write},
+    str::FromStr,
+};
 use sysinfo::{
-    CpuExt, NetworkExt, NetworksExt, Pid, ProcessExt, Signal, System, SystemExt, UserExt,
+    CpuExt, NetworkExt, NetworksExt, Pid, ProcessExt, Signal, Signal::*, System, SystemExt, UserExt,
 };
 
 const signals: &[Signal] = &[

@@ -1,20 +1,26 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use std::cell::UnsafeCell;
-use std::collections::HashMap;
-use std::fmt;
-use std::fs::{self, File};
-use std::io::Read;
-use std::mem::MaybeUninit;
-use std::path::{Path, PathBuf};
-use std::str::FromStr;
+use std::{
+    cell::UnsafeCell,
+    collections::HashMap,
+    fmt,
+    fs::{self, File},
+    io::Read,
+    mem::MaybeUninit,
+    path::{Path, PathBuf},
+    str::FromStr,
+};
 
 use libc::{gid_t, kill, uid_t};
 
-use crate::sys::system::SystemInfo;
-use crate::sys::utils::{get_all_data, get_all_data_from_file, realpath, FileCounter};
-use crate::utils::into_iter;
-use crate::{DiskUsage, Gid, Pid, ProcessExt, ProcessRefreshKind, ProcessStatus, Signal, Uid};
+use crate::{
+    sys::{
+        system::SystemInfo,
+        utils::{get_all_data, get_all_data_from_file, realpath, FileCounter},
+    },
+    utils::into_iter,
+    DiskUsage, Gid, Pid, ProcessExt, ProcessRefreshKind, ProcessStatus, Signal, Uid,
+};
 
 #[doc(hidden)]
 impl From<u32> for ProcessStatus {

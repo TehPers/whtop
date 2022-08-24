@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct GetProcessesResponse {
     pub processes: Vec<ProcessInfo>,
 }

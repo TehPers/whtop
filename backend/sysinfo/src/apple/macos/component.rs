@@ -1,7 +1,6 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::ffi;
-use crate::ComponentExt;
+use crate::{sys::ffi, ComponentExt};
 
 use libc::{c_char, c_int, c_void};
 

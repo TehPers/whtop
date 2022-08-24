@@ -1,8 +1,10 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use std::fs::File;
-use std::io::{self, Read, Seek, SeekFrom};
-use std::path::Path;
+use std::{
+    fs::File,
+    io::{self, Read, Seek, SeekFrom},
+    path::Path,
+};
 
 use crate::sys::system::REMAINING_FILES;
 
@@ -21,9 +23,7 @@ pub(crate) fn get_all_data<P: AsRef<Path>>(file_path: P, size: usize) -> io::Res
 #[allow(clippy::useless_conversion)]
 pub(crate) fn realpath(original: &Path) -> std::path::PathBuf {
     use libc::{lstat, stat, S_IFLNK, S_IFMT};
-    use std::fs;
-    use std::mem::MaybeUninit;
-    use std::path::PathBuf;
+    use std::{fs, mem::MaybeUninit, path::PathBuf};
 
     fn and(x: u32, y: u32) -> u32 {
         x & y

@@ -2,8 +2,7 @@
 
 use crate::{CpuExt, NetworkExt, NetworksExt, Pid, Process, ProcessExt, System, SystemExt};
 use libc::{self, c_char, c_float, c_uint, c_void, pid_t, size_t};
-use std::borrow::BorrowMut;
-use std::ffi::CString;
+use std::{borrow::BorrowMut, ffi::CString};
 
 /// Equivalent of [`System`][crate::System] struct.
 pub type CSystem = *mut c_void;

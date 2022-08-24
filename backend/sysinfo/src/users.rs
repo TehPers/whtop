@@ -6,8 +6,7 @@ use crate::{
 };
 
 use libc::{getgrgid, getgrouplist};
-use std::fs::File;
-use std::io::Read;
+use std::{fs::File, io::Read};
 
 pub fn get_users_list() -> Vec<User> {
     let mut s = String::new();

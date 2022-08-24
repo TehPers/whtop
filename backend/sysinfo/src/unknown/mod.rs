@@ -7,9 +7,11 @@ pub mod network;
 pub mod process;
 pub mod system;
 
-pub use self::component::Component;
-pub use self::cpu::Cpu;
-pub use self::disk::Disk;
-pub use self::network::{NetworkData, Networks};
-pub use self::process::Process;
-pub use self::system::System;
+pub use self::{
+    component::Component,
+    cpu::Cpu,
+    disk::Disk,
+    network::{NetworkData, Networks},
+    process::Process,
+    system::System,
+};

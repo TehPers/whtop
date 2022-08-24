@@ -5,12 +5,14 @@ use crate::{
     CpuRefreshKind, LoadAvg, Pid, ProcessRefreshKind, RefreshKind, SystemExt, User,
 };
 
-use std::cell::UnsafeCell;
-use std::collections::HashMap;
-use std::ffi::CStr;
-use std::mem::MaybeUninit;
-use std::path::{Path, PathBuf};
-use std::ptr::NonNull;
+use std::{
+    cell::UnsafeCell,
+    collections::HashMap,
+    ffi::CStr,
+    mem::MaybeUninit,
+    path::{Path, PathBuf},
+    ptr::NonNull,
+};
 
 use super::utils::{
     self, boot_time, c_buf_to_string, from_cstr_array, get_frequency_for_cpu, get_sys_value,

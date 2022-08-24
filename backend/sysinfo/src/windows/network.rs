@@ -4,11 +4,11 @@ use crate::{NetworkExt, NetworksExt, NetworksIter};
 
 use std::collections::{hash_map, HashMap};
 
-use winapi::shared::ifdef::{MediaConnectStateDisconnected, NET_LUID};
-use winapi::shared::netioapi::{
-    FreeMibTable, GetIfEntry2, GetIfTable2, MIB_IF_ROW2, PMIB_IF_TABLE2,
+use winapi::shared::{
+    ifdef::{MediaConnectStateDisconnected, NET_LUID},
+    netioapi::{FreeMibTable, GetIfEntry2, GetIfTable2, MIB_IF_ROW2, PMIB_IF_TABLE2},
+    winerror::NO_ERROR,
 };
-use winapi::shared::winerror::NO_ERROR;
 
 macro_rules! old_and_new {
     ($ty_:expr, $name:ident, $old:ident, $new_val:expr) => {{

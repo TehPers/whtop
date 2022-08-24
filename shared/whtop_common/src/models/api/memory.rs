@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Response from getting the memory usage metrics.
-#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct GetMemoryResponse {
     /// Total memory in kilobytes.
     pub total: u64,

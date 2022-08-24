@@ -5,9 +5,7 @@ use crate::sys::system::get_sys_value;
 use crate::{CpuExt, CpuRefreshKind};
 
 use libc::{c_char, host_processor_info, mach_task_self};
-use std::mem;
-use std::ops::Deref;
-use std::sync::Arc;
+use std::{mem, ops::Deref, sync::Arc};
 
 pub(crate) struct UnsafePtr<T>(*mut T);
 

@@ -1,9 +1,11 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use std::ffi::CStr;
-use std::mem::{self, MaybeUninit};
-use std::ops::Deref;
-use std::path::{Path, PathBuf};
+use std::{
+    ffi::CStr,
+    mem::{self, MaybeUninit},
+    ops::Deref,
+    path::{Path, PathBuf},
+};
 
 use std::borrow::Borrow;
 
@@ -11,8 +13,7 @@ use libc::{c_int, c_void, kill, size_t};
 
 use crate::{DiskUsage, Gid, Pid, ProcessExt, ProcessRefreshKind, ProcessStatus, Signal, Uid};
 
-use crate::sys::process::ThreadStatus;
-use crate::sys::system::Wrap;
+use crate::sys::{process::ThreadStatus, system::Wrap};
 
 #[doc = include_str!("../../../md_doc/process.md")]
 pub struct Process {

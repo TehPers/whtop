@@ -1,21 +1,25 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::component::{self, Component};
-use crate::sys::cpu::*;
-use crate::sys::disk;
-use crate::sys::process::*;
-use crate::sys::utils::get_all_data;
 use crate::{
+    sys::{
+        component::{self, Component},
+        cpu::*,
+        disk,
+        process::*,
+        utils::get_all_data,
+    },
     CpuRefreshKind, Disk, LoadAvg, Networks, Pid, ProcessRefreshKind, RefreshKind, SystemExt, User,
 };
 
 use libc::{self, c_char, c_int, sysconf, _SC_CLK_TCK, _SC_HOST_NAME_MAX, _SC_PAGESIZE};
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
-use std::path::{Path, PathBuf};
-use std::str::FromStr;
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{BufRead, BufReader, Read},
+    path::{Path, PathBuf},
+    str::FromStr,
+    sync::{Arc, Mutex},
+};
 
 // This whole thing is to prevent having too many files open at once. It could be problematic
 // for processes using a lot of files and using sysinfo at the same time.

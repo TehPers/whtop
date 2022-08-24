@@ -3,16 +3,11 @@
 use crate::{
     common::{Gid, Uid},
     sys::{Component, Cpu, Disk, Networks, Process},
-};
-use crate::{
     CpuRefreshKind, DiskType, DiskUsage, LoadAvg, NetworksIter, Pid, ProcessRefreshKind,
     ProcessStatus, RefreshKind, Signal, User,
 };
 
-use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::fmt::Debug;
-use std::path::Path;
+use std::{collections::HashMap, ffi::OsStr, fmt::Debug, path::Path};
 
 /// Contains all the methods of the [`Disk`][crate::Disk] struct.
 ///

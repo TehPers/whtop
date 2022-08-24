@@ -1,9 +1,4 @@
-use axum::{
-    body::HttpBody,
-    response::IntoResponse,
-    routing::{get, MethodRouter},
-    Extension, Json,
-};
+use axum::{body::HttpBody, response::IntoResponse, routing::MethodRouter, Extension, Json};
 use std::{cmp::Reverse, path::PathBuf, sync::Arc};
 use sysinfo::{Pid, Process, ProcessExt, System, SystemExt};
 use tokio::sync::RwLock;
@@ -13,7 +8,7 @@ pub fn processes<B>() -> MethodRouter<B>
 where
     B: HttpBody + Send + 'static,
 {
-    get(get_processes)
+    MethodRouter::new().get(get_processes)
 }
 
 async fn get_processes(Extension(system): Extension<Arc<RwLock<System>>>) -> impl IntoResponse {

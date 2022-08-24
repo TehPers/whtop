@@ -2,8 +2,10 @@
 
 use libc::{self, c_char, if_msghdr2, CTL_NET, NET_RT_IFLIST2, PF_ROUTE, RTM_IFINFO2};
 
-use std::collections::{hash_map, HashMap};
-use std::ptr::null_mut;
+use std::{
+    collections::{hash_map, HashMap},
+    ptr::null_mut,
+};
 
 use crate::{NetworkExt, NetworksExt, NetworksIter};
 

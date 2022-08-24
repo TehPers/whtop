@@ -1,7 +1,6 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use winapi::shared::minwindef::FILETIME;
-use winapi::um::winnt::LPWSTR;
+use winapi::{shared::minwindef::FILETIME, um::winnt::LPWSTR};
 
 use std::time::SystemTime;
 

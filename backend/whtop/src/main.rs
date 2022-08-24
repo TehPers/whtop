@@ -1,6 +1,7 @@
 mod config;
 mod errors;
 mod layers;
+mod modules;
 mod routes;
 mod startup;
 

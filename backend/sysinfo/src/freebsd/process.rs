@@ -2,8 +2,10 @@
 
 use crate::{DiskUsage, Gid, Pid, ProcessExt, ProcessRefreshKind, ProcessStatus, Signal, Uid};
 
-use std::fmt;
-use std::path::{Path, PathBuf};
+use std::{
+    fmt,
+    path::{Path, PathBuf},
+};
 
 use super::utils::{get_sys_value_str, WrapMap};
 

@@ -2,9 +2,7 @@
 
 use crate::{NetworkData, Networks, NetworksExt, UserExt};
 
-use std::convert::From;
-use std::fmt;
-use std::str::FromStr;
+use std::{convert::From, fmt, str::FromStr};
 
 /// Trait to have a common conversions for the [`Pid`][crate::Pid] type.
 ///

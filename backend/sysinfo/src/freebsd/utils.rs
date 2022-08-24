@@ -2,11 +2,7 @@
 
 use crate::{Pid, Process};
 use libc::{c_char, c_int, timeval};
-use std::cell::UnsafeCell;
-use std::collections::HashMap;
-use std::ffi::CStr;
-use std::mem;
-use std::time::SystemTime;
+use std::{cell::UnsafeCell, collections::HashMap, ffi::CStr, mem, time::SystemTime};
 
 /// This struct is used to switch between the "old" and "new" every time you use "get_mut".
 #[derive(Debug)]

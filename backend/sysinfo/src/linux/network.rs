@@ -1,8 +1,6 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
+use std::{fs::File, io::Read, path::Path};
 
 use crate::{NetworkExt, NetworksExt, NetworksIter};
 use std::collections::{hash_map, HashMap};
@@ -268,8 +266,7 @@ impl NetworkExt for NetworkData {
 #[cfg(test)]
 mod test {
     use super::refresh_networks_list_from_sysfs;
-    use std::collections::HashMap;
-    use std::fs;
+    use std::{collections::HashMap, fs};
 
     #[test]
     fn refresh_networks_list_add_interface() {

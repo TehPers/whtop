@@ -1,12 +1,8 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::component::Component;
-use crate::sys::cpu::*;
-use crate::sys::disk::*;
 #[cfg(target_os = "macos")]
 use crate::sys::ffi;
-use crate::sys::network::Networks;
-use crate::sys::process::*;
+use crate::sys::{component::Component, cpu::*, disk::*, network::Networks, process::*};
 #[cfg(target_os = "macos")]
 use core_foundation_sys::base::{kCFAllocatorDefault, CFRelease};
 
@@ -17,12 +13,9 @@ use crate::{
 #[cfg(all(target_os = "macos", not(feature = "apple-sandbox")))]
 use crate::ProcessExt;
 
-use std::cell::UnsafeCell;
-use std::collections::HashMap;
-use std::mem;
-use std::sync::Arc;
 #[cfg(all(target_os = "macos", not(feature = "apple-sandbox")))]
 use std::time::SystemTime;
+use std::{cell::UnsafeCell, collections::HashMap, mem, sync::Arc};
 
 #[cfg(all(target_os = "macos", not(feature = "apple-sandbox")))]
 use libc::size_t;

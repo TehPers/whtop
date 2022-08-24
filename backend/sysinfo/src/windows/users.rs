@@ -1,26 +1,32 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::utils::to_str;
 use crate::{
     common::{Gid, Uid},
+    sys::utils::to_str,
     User,
 };
 
 use std::ptr::null_mut;
-use winapi::shared::lmcons::{MAX_PREFERRED_LENGTH, NET_API_STATUS};
-use winapi::shared::minwindef::DWORD;
-use winapi::shared::ntstatus::STATUS_SUCCESS;
-use winapi::shared::winerror::ERROR_MORE_DATA;
-use winapi::um::lmaccess::{NetUserEnum, NetUserGetLocalGroups};
-use winapi::um::lmaccess::{
-    FILTER_NORMAL_ACCOUNT, LG_INCLUDE_INDIRECT, LPLOCALGROUP_USERS_INFO_0, USER_INFO_0,
+use winapi::{
+    shared::{
+        lmcons::{MAX_PREFERRED_LENGTH, NET_API_STATUS},
+        minwindef::DWORD,
+        ntstatus::STATUS_SUCCESS,
+        winerror::ERROR_MORE_DATA,
+    },
+    um::{
+        lmaccess::{
+            NetUserEnum, NetUserGetLocalGroups, FILTER_NORMAL_ACCOUNT, LG_INCLUDE_INDIRECT,
+            LPLOCALGROUP_USERS_INFO_0, USER_INFO_0,
+        },
+        lmapibuf::NetApiBufferFree,
+        ntlsa::{
+            LsaEnumerateLogonSessions, LsaFreeReturnBuffer, LsaGetLogonSessionData,
+            PSECURITY_LOGON_SESSION_DATA,
+        },
+        winnt::{LPWSTR, PLUID},
+    },
 };
-use winapi::um::lmapibuf::NetApiBufferFree;
-use winapi::um::ntlsa::{
-    LsaEnumerateLogonSessions, LsaFreeReturnBuffer, LsaGetLogonSessionData,
-    PSECURITY_LOGON_SESSION_DATA,
-};
-use winapi::um::winnt::{LPWSTR, PLUID};
 
 // FIXME: once this is mreged in winapi, it can be removed.
 #[allow(non_upper_case_globals)]

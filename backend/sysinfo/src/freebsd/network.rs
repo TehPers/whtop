@@ -1,7 +1,9 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use std::collections::{hash_map, HashMap};
-use std::mem::MaybeUninit;
+use std::{
+    collections::{hash_map, HashMap},
+    mem::MaybeUninit,
+};
 
 use super::utils;
 use crate::{NetworkExt, NetworksExt, NetworksIter};

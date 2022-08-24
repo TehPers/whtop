@@ -1,33 +1,32 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::sys::tools::KeyHandler;
-use crate::{CpuExt, CpuRefreshKind, LoadAvg};
+use crate::{sys::tools::KeyHandler, CpuExt, CpuRefreshKind, LoadAvg};
 
-use std::collections::HashMap;
-use std::io::Error;
-use std::mem;
-use std::ops::DerefMut;
-use std::ptr::null_mut;
-use std::sync::Mutex;
+use std::{collections::HashMap, io::Error, mem, ops::DerefMut, ptr::null_mut, sync::Mutex};
 
 use ntapi::ntpoapi::PROCESSOR_POWER_INFORMATION;
 
-use winapi::shared::minwindef::FALSE;
-use winapi::shared::winerror::{ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS};
-use winapi::um::handleapi::CloseHandle;
-use winapi::um::pdh::{
-    PdhAddEnglishCounterA, PdhAddEnglishCounterW, PdhCloseQuery, PdhCollectQueryData,
-    PdhCollectQueryDataEx, PdhGetFormattedCounterValue, PdhOpenQueryA, PdhRemoveCounter,
-    PDH_FMT_COUNTERVALUE, PDH_FMT_DOUBLE, PDH_HCOUNTER, PDH_HQUERY,
-};
-use winapi::um::powerbase::CallNtPowerInformation;
-use winapi::um::synchapi::CreateEventA;
-use winapi::um::sysinfoapi::GetLogicalProcessorInformationEx;
-use winapi::um::sysinfoapi::SYSTEM_INFO;
-use winapi::um::winbase::{RegisterWaitForSingleObject, INFINITE};
-use winapi::um::winnt::{
-    ProcessorInformation, RelationAll, RelationProcessorCore, BOOLEAN, HANDLE,
-    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, PVOID, WT_EXECUTEDEFAULT,
+use winapi::{
+    shared::{
+        minwindef::FALSE,
+        winerror::{ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS},
+    },
+    um::{
+        handleapi::CloseHandle,
+        pdh::{
+            PdhAddEnglishCounterA, PdhAddEnglishCounterW, PdhCloseQuery, PdhCollectQueryData,
+            PdhCollectQueryDataEx, PdhGetFormattedCounterValue, PdhOpenQueryA, PdhRemoveCounter,
+            PDH_FMT_COUNTERVALUE, PDH_FMT_DOUBLE, PDH_HCOUNTER, PDH_HQUERY,
+        },
+        powerbase::CallNtPowerInformation,
+        synchapi::CreateEventA,
+        sysinfoapi::{GetLogicalProcessorInformationEx, SYSTEM_INFO},
+        winbase::{RegisterWaitForSingleObject, INFINITE},
+        winnt::{
+            ProcessorInformation, RelationAll, RelationProcessorCore, BOOLEAN, HANDLE,
+            PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, PVOID, WT_EXECUTEDEFAULT,
+        },
+    },
 };
 
 // This formula comes from linux's include/linux/sched/loadavg.h

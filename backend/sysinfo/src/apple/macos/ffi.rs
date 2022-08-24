@@ -1,8 +1,10 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use core_foundation_sys::base::CFAllocatorRef;
-use core_foundation_sys::dictionary::CFMutableDictionaryRef;
-use core_foundation_sys::string::{CFStringEncoding, CFStringRef};
+use core_foundation_sys::{
+    base::CFAllocatorRef,
+    dictionary::CFMutableDictionaryRef,
+    string::{CFStringEncoding, CFStringRef},
+};
 
 use libc::{c_char, c_void};
 #[cfg(not(feature = "apple-sandbox"))]

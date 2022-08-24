@@ -2,10 +2,7 @@
 
 #![allow(clippy::too_many_arguments)]
 
-use std::collections::HashSet;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
+use std::{collections::HashSet, fs::File, io::Read, path::Path};
 
 use crate::CpuExt;
 

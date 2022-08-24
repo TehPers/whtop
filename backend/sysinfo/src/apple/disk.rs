@@ -1,15 +1,16 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use crate::utils::to_cpath;
-use crate::{DiskExt, DiskType};
+use crate::{utils::to_cpath, DiskExt, DiskType};
 
 #[cfg(target_os = "macos")]
 pub(crate) use crate::sys::inner::disk::*;
 
 use libc::statfs;
-use std::ffi::{OsStr, OsString};
-use std::mem;
-use std::path::{Path, PathBuf};
+use std::{
+    ffi::{OsStr, OsString},
+    mem,
+    path::{Path, PathBuf},
+};
 
 #[doc = include_str!("../../md_doc/disk.md")]
 pub struct Disk {

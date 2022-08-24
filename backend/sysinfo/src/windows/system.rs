@@ -6,41 +6,51 @@ use crate::{
 };
 use winapi::um::winreg::HKEY_LOCAL_MACHINE;
 
-use crate::sys::component::{self, Component};
-use crate::sys::cpu::*;
-use crate::sys::disk::{get_disks, Disk};
-use crate::sys::process::{get_start_time, update_memory, Process};
-use crate::sys::tools::*;
-use crate::sys::users::get_users;
-use crate::sys::utils::get_now;
+use crate::sys::{
+    component::{self, Component},
+    cpu::*,
+    disk::{get_disks, Disk},
+    process::{get_start_time, update_memory, Process},
+    tools::*,
+    users::get_users,
+    utils::get_now,
+};
 
 use crate::utils::into_iter;
 
-use std::cell::UnsafeCell;
-use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::mem::{size_of, zeroed};
-use std::os::windows::ffi::OsStrExt;
-use std::slice::from_raw_parts;
-use std::time::SystemTime;
+use std::{
+    cell::UnsafeCell,
+    collections::HashMap,
+    ffi::OsStr,
+    mem::{size_of, zeroed},
+    os::windows::ffi::OsStrExt,
+    slice::from_raw_parts,
+    time::SystemTime,
+};
 
 use ntapi::ntexapi::{
     NtQuerySystemInformation, SystemProcessInformation, SYSTEM_PROCESS_INFORMATION,
 };
-use winapi::ctypes::wchar_t;
-use winapi::shared::minwindef::{DWORD, FALSE, HKEY, LPBYTE, TRUE};
-use winapi::shared::ntdef::{PVOID, ULONG};
-use winapi::shared::ntstatus::STATUS_INFO_LENGTH_MISMATCH;
-use winapi::shared::winerror;
-use winapi::um::minwinbase::STILL_ACTIVE;
-use winapi::um::processthreadsapi::GetExitCodeProcess;
-use winapi::um::psapi::{GetPerformanceInfo, PERFORMANCE_INFORMATION};
-use winapi::um::sysinfoapi::{
-    ComputerNamePhysicalDnsHostname, GetComputerNameExW, GetTickCount64, GlobalMemoryStatusEx,
-    MEMORYSTATUSEX,
+use winapi::{
+    ctypes::wchar_t,
+    shared::{
+        minwindef::{DWORD, FALSE, HKEY, LPBYTE, TRUE},
+        ntdef::{PVOID, ULONG},
+        ntstatus::STATUS_INFO_LENGTH_MISMATCH,
+        winerror,
+    },
+    um::{
+        minwinbase::STILL_ACTIVE,
+        processthreadsapi::GetExitCodeProcess,
+        psapi::{GetPerformanceInfo, PERFORMANCE_INFORMATION},
+        sysinfoapi::{
+            ComputerNamePhysicalDnsHostname, GetComputerNameExW, GetTickCount64,
+            GlobalMemoryStatusEx, MEMORYSTATUSEX,
+        },
+        winnt::{HANDLE, KEY_READ},
+        winreg::{RegOpenKeyExW, RegQueryValueExW},
+    },
 };
-use winapi::um::winnt::{HANDLE, KEY_READ};
-use winapi::um::winreg::{RegOpenKeyExW, RegQueryValueExW};
 
 declare_signals! {
     (),

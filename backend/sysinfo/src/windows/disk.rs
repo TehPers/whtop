@@ -2,23 +2,27 @@
 
 use crate::{DiskExt, DiskType};
 
-use std::ffi::{OsStr, OsString};
-use std::mem::size_of;
-use std::path::Path;
+use std::{
+    ffi::{OsStr, OsString},
+    mem::size_of,
+    path::Path,
+};
 
-use winapi::ctypes::c_void;
-use winapi::shared::minwindef::{DWORD, MAX_PATH};
-use winapi::um::fileapi::{
-    CreateFileW, GetDiskFreeSpaceExW, GetDriveTypeW, GetLogicalDrives, GetVolumeInformationW,
-    OPEN_EXISTING,
+use winapi::{
+    ctypes::c_void,
+    shared::minwindef::{DWORD, MAX_PATH},
+    um::{
+        fileapi::{
+            CreateFileW, GetDiskFreeSpaceExW, GetDriveTypeW, GetLogicalDrives,
+            GetVolumeInformationW, OPEN_EXISTING,
+        },
+        handleapi::{CloseHandle, INVALID_HANDLE_VALUE},
+        ioapiset::DeviceIoControl,
+        winbase::{DRIVE_FIXED, DRIVE_REMOVABLE},
+        winioctl::{DEVICE_TRIM_DESCRIPTOR, IOCTL_STORAGE_QUERY_PROPERTY, STORAGE_PROPERTY_QUERY},
+        winnt::{FILE_SHARE_READ, FILE_SHARE_WRITE, HANDLE, ULARGE_INTEGER},
+    },
 };
-use winapi::um::handleapi::{CloseHandle, INVALID_HANDLE_VALUE};
-use winapi::um::ioapiset::DeviceIoControl;
-use winapi::um::winbase::{DRIVE_FIXED, DRIVE_REMOVABLE};
-use winapi::um::winioctl::{
-    DEVICE_TRIM_DESCRIPTOR, IOCTL_STORAGE_QUERY_PROPERTY, STORAGE_PROPERTY_QUERY,
-};
-use winapi::um::winnt::{FILE_SHARE_READ, FILE_SHARE_WRITE, HANDLE, ULARGE_INTEGER};
 
 #[doc = include_str!("../../md_doc/disk.md")]
 pub struct Disk {

@@ -45,16 +45,51 @@ impl Component for Dashboard {
                 ctx.link().send_future(update_stats(client));
                 false
             }
-            DashboardMessage::RequestError(error) => {
-                self.state = DashboardState::Error(error);
-                true
-            }
             DashboardMessage::UpdateStats {
                 memory_stats,
                 cpu_stats,
                 process_stats,
             } => {
+                let (prev_memory_stats, prev_cpu_stats, prev_process_stats) = match &self.state {
+                    DashboardState::Ready {
+                        memory_stats,
+                        cpu_stats,
+                        process_stats,
+                        ..
+                    } => (Some(memory_stats), Some(cpu_stats), Some(process_stats)),
+                    _ => (None, None, None),
+                };
+
+                macro_rules! try_stats {
+                    ($result:expr, $else:expr, $errors:expr) => {
+                        match $result {
+                            Ok(stats) => stats,
+                            Err(error) => {
+                                $errors.push(error);
+                                $else
+                            }
+                        }
+                    };
+                }
+                let mut errors = Vec::with_capacity(3);
+                let memory_stats = try_stats!(
+                    memory_stats,
+                    prev_memory_stats.cloned().unwrap_or_default(),
+                    errors
+                );
+                let cpu_stats = try_stats!(
+                    cpu_stats,
+                    prev_cpu_stats.cloned().unwrap_or_default(),
+                    errors
+                );
+                let process_stats = try_stats!(
+                    process_stats,
+                    prev_process_stats.cloned().unwrap_or_default(),
+                    errors
+                );
+
                 self.state = DashboardState::Ready {
+                    errors,
                     memory_stats,
                     cpu_stats,
                     process_stats,
@@ -72,12 +107,39 @@ impl Component for Dashboard {
                 }
             }
             DashboardState::Ready {
+                errors,
                 memory_stats,
                 cpu_stats,
                 process_stats,
             } => {
                 html! {
                     <>
+                        {
+                            if !errors.is_empty() {
+                                html! {
+                                    <>
+                                        <h2 class={"errors"}>{"Errors"}</h2>
+                                        <section class={"errors"}>
+                                            <p>{"One or more errors occurred while fetching system information:"}</p>
+                                            {
+                                                for errors.iter().map(|error| {
+                                                    html! {
+                                                        <>
+                                                            <pre>
+                                                                {format!("{error:?}")}
+                                                            </pre>
+                                                            <hr />
+                                                        </>
+                                                    }
+                                                })
+                                            }
+                                        </section>
+                                    </>
+                                }
+                            } else {
+                                html! {}
+                            }
+                        }
                         <h2>{"Memory"}</h2>
                         <section class={"memory"}>
                             <MemoryUsage
@@ -115,14 +177,6 @@ impl Component for Dashboard {
                     </>
                 }
             }
-            DashboardState::Error(error) => html! {
-                <>
-                    <h1>{"An error occurred"}</h1>
-                    <pre>
-                        {format!("{error:?}")}
-                    </pre>
-                </>
-            },
         };
 
         html! {
@@ -137,22 +191,21 @@ impl Component for Dashboard {
 pub enum DashboardMessage {
     InvalidateResponse,
     UpdateStats {
-        memory_stats: GetMemoryResponse,
-        cpu_stats: GetCpuResponse,
-        process_stats: GetProcessesResponse,
+        memory_stats: anyhow::Result<GetMemoryResponse>,
+        cpu_stats: anyhow::Result<GetCpuResponse>,
+        process_stats: anyhow::Result<GetProcessesResponse>,
     },
-    RequestError(anyhow::Error),
 }
 
 #[derive(Debug)]
 enum DashboardState {
     Uninitialized,
     Ready {
+        errors: Vec<anyhow::Error>,
         memory_stats: GetMemoryResponse,
         cpu_stats: GetCpuResponse,
         process_stats: GetProcessesResponse,
     },
-    Error(anyhow::Error),
 }
 
 async fn get_stats<T>(client: HttpClient, endpoint: &str) -> anyhow::Result<T>
@@ -170,17 +223,8 @@ where
 }
 
 async fn update_stats(client: HttpClient) -> DashboardMessage {
-    macro_rules! try_stats {
-        ($val:expr) => {
-            match $val {
-                Ok(val) => val,
-                Err(error) => return DashboardMessage::RequestError(error),
-            }
-        };
-    }
-
     // Fetch stats
-    const BASE_URL: &str = "/api";
+    const BASE_URL: &str = "/api/system";
     let memory_url = format!("{BASE_URL}/memory");
     let cpu_url = format!("{BASE_URL}/cpu");
     let processes_url = format!("{BASE_URL}/processes");
@@ -190,19 +234,17 @@ async fn update_stats(client: HttpClient) -> DashboardMessage {
         get_stats(client.clone(), &processes_url)
     );
 
-    // Error handling
-    let memory_stats: GetMemoryResponse = try_stats!(memory_stats);
-    let mut cpu_stats: GetCpuResponse = try_stats!(cpu_stats);
-    let process_stats: GetProcessesResponse = try_stats!(process_stats);
-
     // Update CPU global frequency
-    cpu_stats.global.frequency = cpu_stats
-        .cpus
-        .iter()
-        .map(|cpu| cpu.inner.frequency)
-        .sum::<u64>()
-        .checked_div(cpu_stats.cpus.len() as u64)
-        .unwrap_or(0);
+    let cpu_stats = cpu_stats.map(|mut stats: GetCpuResponse| {
+        stats.global.frequency = stats
+            .cpus
+            .iter()
+            .map(|cpu| cpu.inner.frequency)
+            .sum::<u64>()
+            .checked_div(stats.cpus.len() as u64)
+            .unwrap_or(0);
+        stats
+    });
 
     DashboardMessage::UpdateStats {
         memory_stats,
