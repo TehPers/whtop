@@ -75,6 +75,8 @@ a {
     background-color: $dashboard-section-bg-color;
     border-radius: $dashboard-section-border-radius;
     padding: 2rem;
+    max-height: 80vh;
+    overflow-y: auto;
   }
 
   h2 {
@@ -224,10 +226,21 @@ a {
     padding: 0.5rem;
     border-bottom: 1px solid var(--theme-text);
 
+    @include breakpoint("mobile") {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
     >* {
       flex: 1;
       margin-left: 0.5rem;
       margin-right: 0.5rem;
+
+      @include breakpoint("mobile") {
+        margin: 0;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
     }
 
     >.process-list-row-cpu,
@@ -245,9 +258,24 @@ a {
         "name usage"
         "bar bar";
 
+      @include breakpoint("mobile") {
+        grid-template-areas:
+          "name"
+          "usage"
+          "bar";
+
+        >.cpu-usage-name {
+          text-align: center;
+        }
+      }
+
       >.cpu-usage-usage {
         grid-area: usage;
         text-align: right;
+
+        @include breakpoint("mobile") {
+          text-align: center;
+        }
       }
     }
   }

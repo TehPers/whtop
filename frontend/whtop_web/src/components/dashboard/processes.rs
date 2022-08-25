@@ -14,22 +14,9 @@ pub fn process_list(props: &ProcessListProps) -> Html {
     let process_rows = props.process_list.iter().map(|process| {
         html! {
             <div class={"process-list-row"}>
-                <div class={"process-list-row-pid"}>
-                    {&process.pid}
-                    {
-                        if let Some(parent_pid) = process.parent_pid.as_ref() {
-                            format!(" ({parent_pid})")
-                        } else {
-                            String::new()
-                        }
-                    }
-                </div>
-                <div class={"process-list-row-name"}>
-                    {&process.name}
-                </div>
                 <div class={"process-list-row-cpu"}>
                     <CpuUsage
-                        cpu_name={process.name.clone()}
+                        cpu_name={format!("{name} ({pid})", name=process.name, pid=process.pid)}
                         cpu_frequency={None}
                         cpu_usage={process.cpu}
                     />
