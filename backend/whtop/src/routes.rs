@@ -1,9 +1,5 @@
-mod cpu;
-mod error;
-mod memory;
-mod processes;
+pub mod api;
 
-pub use cpu::*;
+mod error;
+
 pub use error::*;
-pub use memory::*;
-pub use processes::*;

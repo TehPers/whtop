@@ -31,9 +31,9 @@ where
     );
     let system = Arc::new(RwLock::new(system));
     Router::new()
-        .route("/cpu", crate::routes::cpu())
-        .route("/memory", crate::routes::memory())
-        .route("/processes", crate::routes::processes())
+        .route("/cpu", crate::routes::api::system::cpu())
+        .route("/memory", crate::routes::api::system::memory())
+        .route("/processes", crate::routes::api::system::processes())
         .layer(
             ServiceBuilder::new()
                 .layer(RefreshSystemLayer::new(
