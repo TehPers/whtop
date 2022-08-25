@@ -3,7 +3,10 @@ use anyhow::Context;
 use axum::{body::HttpBody, Extension, Router};
 use std::sync::Arc;
 use tower::ServiceBuilder;
-use tower_http::{trace::TraceLayer, compression::CompressionLayer};
+use tower_http::{
+    compression::{predicate::SizeAbove, CompressionLayer},
+    trace::TraceLayer,
+};
 use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -52,7 +55,7 @@ where
         .merge(frontend_router)
         .layer(
             ServiceBuilder::new()
-                .layer(CompressionLayer::new())
+                .layer(CompressionLayer::new().compress_when(SizeAbove::new(1000)))
                 .layer(TraceLayer::new_for_http())
                 .layer(Extension(config)),
         );
