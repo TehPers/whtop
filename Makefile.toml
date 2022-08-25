@@ -57,6 +57,7 @@ command = "docker"
 args = ["build", "-t", "whtop", "."]
 
 [tasks.run-docker]
+dependencies = ["build-docker"]
 command = "docker"
 args = [
     "run",
