@@ -20,9 +20,9 @@ impl Component for Dashboard {
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        // Invalidate the response every second
+        // Invalidate the response every 2 seconds
         let link = ctx.link().clone();
-        let interval = Interval::new(1000, move || {
+        let interval = Interval::new(2000, move || {
             link.send_message(DashboardMessage::InvalidateResponse)
         });
 

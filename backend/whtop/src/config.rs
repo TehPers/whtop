@@ -20,7 +20,7 @@ pub struct AppConfig {
 impl Default for AppConfig {
     fn default() -> Self {
         AppConfig {
-            refresh_rate_secs: 1.0,
+            refresh_rate_secs: 2.0,
             address: (Ipv6Addr::UNSPECIFIED, 8080).into(),
             serve_static: true,
             static_dir: "dist".into(),
