@@ -25,9 +25,9 @@ where
     // Create system info tracker
     let system = System::new_with_specifics(
         RefreshKind::new()
-            .with_cpu(CpuRefreshKind::everything())
+            .with_cpu(CpuRefreshKind::new().with_cpu_usage().with_frequency())
             .with_memory()
-            .with_processes(ProcessRefreshKind::everything()),
+            .with_processes(ProcessRefreshKind::new().with_cpu()),
     );
     let system = Arc::new(RwLock::new(system));
     Router::new()
