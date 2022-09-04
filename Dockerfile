@@ -41,5 +41,5 @@ COPY --from=build-frontend /build/dist ./dist
 COPY --from=build-backend /build/whtop ./whtop
 
 # Run the application
-ENV RUST_LOG="info" WHTOP_ADDRESS="0.0.0.0:8080"
+ENV RUST_LOG="info" WHTOP_ADDRESS="0.0.0.0:8080" WHTOP_SERVE_STATIC="true" WHTOP_STATIC_DIR="/deploy/dist"
 ENTRYPOINT ["./whtop"]

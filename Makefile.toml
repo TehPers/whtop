@@ -2,17 +2,31 @@
 default_to_workspace = false
 skip_core_tasks = true
 
+[env]
+RUST_BACKTRACE = "1"
+
 [tasks.build]
 run_task = { name = [
     "build-backend",
     "build-frontend",
 ], fork = true, parallel = true }
 
+[tasks.build-release]
+run_task = { name = [
+    "build-release-backend",
+    "build-release-frontend",
+], fork = true, parallel = true }
+
 [tasks.run]
+dependencies = ["build"]
 run_task = { name = [
     "run-backend",
     "run-frontend",
 ], fork = true, parallel = true }
+
+[tasks.run-release]
+dependencies = ["build-release"]
+run_task = { name = ["run-release-backend"], fork = true, parallel = true }
 
 [tasks.clean]
 run_task = { name = [
@@ -26,10 +40,10 @@ command = "trunk"
 args = ["build"]
 
 [tasks.run-frontend]
+env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
 cwd = "./frontend/whtop_web/"
 command = "trunk"
 args = ["serve"]
-env = { TRUNK_SERVE_PROXY_BACKEND = "http://localhost:8081/api/" }
 
 [tasks.clean-frontend]
 cwd = "./frontend/whtop_web/"
@@ -42,15 +56,31 @@ command = "cargo"
 args = ["build", "--bin", "whtop"]
 
 [tasks.run-backend]
+env = { RUST_LOG = "debug,hyper=info", WHTOP_ADDRESS = "0.0.0.0:8081", WHTOP_SERVE_STATIC = "false" }
 cwd = "./backend/whtop/"
 command = "cargo"
 args = ["run", "--bin", "whtop"]
-env = { RUST_LOG = "debug,hyper=info", WHTOP_ADDRESS = "0.0.0.0:8081" }
 
 [tasks.clean-backend]
 cwd = "./backend/whtop/"
 command = "cargo"
 args = ["clean"]
+
+[tasks.build-release-frontend]
+cwd = "./frontend/whtop_web/"
+command = "trunk"
+args = ["build", "--release", "--public-url", "/assets/"]
+
+[tasks.build-release-backend]
+cwd = "./backend/whtop/"
+command = "cargo"
+args = ["build", "--release", "--bin", "whtop"]
+
+[tasks.run-release-backend]
+env = { RUST_LOG = "debug,hyper=info", WHTOP_ADDRESS = "0.0.0.0:8080", WHTOP_SERVE_STATIC = "true", WHTOP_STATIC_DIR = "../../dist/" }
+cwd = "./backend/whtop/"
+command = "cargo"
+args = ["run", "--release", "--bin", "whtop"]
 
 [tasks.build-docker]
 command = "docker"
