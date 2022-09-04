@@ -1,6 +1,6 @@
 use crate::routes::RouteResult;
 use axum::{body::HttpBody, response::IntoResponse, routing::MethodRouter, Extension, Json};
-use std::{cmp::Reverse, path::PathBuf, sync::Arc};
+use std::{cmp::Reverse, sync::Arc};
 use sysinfo::{Pid, Process, ProcessExt, System, SystemExt};
 use tokio::sync::RwLock;
 use whtop_common::models::api::{GetProcessesResponse, ProcessInfo};
@@ -36,13 +36,5 @@ fn create_process_info((pid, process): (&Pid, &Process)) -> ProcessInfo {
         memory: process.memory(),
         virtual_memory: process.virtual_memory(),
         run_time: process.run_time(),
-        path: {
-            let path = process.exe();
-            if path == PathBuf::default() {
-                None
-            } else {
-                Some(path.to_owned())
-            }
-        },
     }
 }

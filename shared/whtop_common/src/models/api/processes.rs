@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 #[derive(Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct GetProcessesResponse {
@@ -23,6 +22,4 @@ pub struct ProcessInfo {
     pub virtual_memory: u64,
     /// The number of seconds the process has been executing for.
     pub run_time: u64,
-    /// The path to the process's executable, if available.
-    pub path: Option<PathBuf>,
 }
