@@ -1,5 +1,5 @@
+use axum::http::Request;
 use futures::{future::BoxFuture, FutureExt};
-use hyper::Request;
 use std::{
     sync::Arc,
     task::{Context, Poll},

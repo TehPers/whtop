@@ -4,10 +4,10 @@ use std::{
 };
 
 use axum::{
+    http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
-use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub type RouteResult<T> = Result<T, RouteError>;
