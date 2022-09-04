@@ -26,6 +26,10 @@ impl Component for Dashboard {
             link.send_message(DashboardMessage::InvalidateResponse)
         });
 
+        // Send initial request
+        ctx.link()
+            .send_message(DashboardMessage::InvalidateResponse);
+
         Dashboard {
             _interval: interval,
             state: DashboardState::Uninitialized,
