@@ -1,7 +1,11 @@
-use crate::{config::AppConfig, layers::RefreshSystemLayer};
+use crate::{
+    config::AppConfig,
+    layers::{CacheControlLayer, CacheOptions, LastModifiedLayer, RefreshSystemLayer},
+};
 use axum::{body::HttpBody, Extension, Router};
 use axum_extra::routing::SpaRouter;
-use std::{sync::Arc, time::Duration};
+use chrono::{Duration, Local};
+use std::sync::Arc;
 use sysinfo::{CpuRefreshKind, ProcessRefreshKind, RefreshKind, System, SystemExt};
 use tokio::sync::RwLock;
 use tower::ServiceBuilder;
@@ -30,17 +34,39 @@ where
             .with_processes(ProcessRefreshKind::new().with_cpu()),
     );
     let system = Arc::new(RwLock::new(system));
+
+    // Layers
+    let refresh_layer = RefreshSystemLayer::new(
+        system.clone(),
+        Duration::seconds(config.refresh_rate_secs.floor() as i64)
+            + Duration::nanoseconds((config.refresh_rate_secs.fract() * 1e9) as i64),
+    );
+    let last_refresh = refresh_layer.last_refresh();
+    let cors_layer = CorsLayer::new().allow_origin(Any);
+    let cache_control_layer = CacheControlLayer::new(CacheOptions {
+        max_age: Some(config.refresh_rate_secs.floor() as u64),
+        public: true,
+        ..Default::default()
+    });
+    let last_modified_layer = LastModifiedLayer::new(move || {
+        let last_refresh = last_refresh.clone();
+        async move {
+            let guard = last_refresh.read().await;
+            guard.unwrap_or_else(Local::now)
+        }
+    });
+
+    // Build router
     Router::new()
         .route("/cpu", crate::routes::api::system::cpu())
         .route("/memory", crate::routes::api::system::memory())
         .route("/processes", crate::routes::api::system::processes())
         .layer(
             ServiceBuilder::new()
-                .layer(RefreshSystemLayer::new(
-                    system.clone(),
-                    Duration::from_secs_f32(config.refresh_rate_secs),
-                ))
-                .layer(CorsLayer::new().allow_origin(Any))
+                .layer(refresh_layer)
+                .layer(cors_layer)
+                .layer(cache_control_layer)
+                .layer(last_modified_layer)
                 .layer(Extension(system)),
         )
 }

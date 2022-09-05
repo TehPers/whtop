@@ -27,6 +27,7 @@ tokio = { version = "1", features = [
     "macros",
     "sync",
 ] }
+# Middleware
 tower = { version = "0.4", features = ["retry", "timeout", "util"] }
 tower-http = { version = "0.3", features = [
     "cors",
@@ -37,11 +38,18 @@ tower-http = { version = "0.3", features = [
     "compression-gzip",
 ] }
 futures = "0.3"
+pin-project-lite = "0.2"
 # Serialization
 serde = { version = "1", features = ["derive"] }
 envy = "0.4"
 # System
 sysinfo = { version = "0.25", path = "../sysinfo" } # need to read from /host/proc
+# Util
+chrono = { version = "0.4", default-features = false, features = [
+    "std",
+    "clock",
+] }
+chrono-tz = "0.6"
 
 [profile.release]
 opt-level = 3

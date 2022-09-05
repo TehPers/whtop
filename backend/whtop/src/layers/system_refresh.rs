@@ -1,12 +1,12 @@
 use axum::http::Request;
+use chrono::{DateTime, Duration, Local};
 use futures::{future::BoxFuture, FutureExt};
 use std::{
     sync::Arc,
     task::{Context, Poll},
-    time::{Duration, Instant},
 };
 use sysinfo::{System, SystemExt};
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 use tower::{Layer, Service};
 use tracing::debug;
 
@@ -14,7 +14,7 @@ use tracing::debug;
 pub struct RefreshSystemLayer {
     system: Arc<RwLock<System>>,
     refresh_rate: Duration,
-    last_refresh: Arc<Mutex<Option<Instant>>>,
+    last_refresh: Arc<RwLock<Option<DateTime<Local>>>>,
 }
 
 impl RefreshSystemLayer {
@@ -25,13 +25,17 @@ impl RefreshSystemLayer {
             last_refresh: Default::default(),
         }
     }
+
+    pub fn last_refresh(&self) -> Arc<RwLock<Option<DateTime<Local>>>> {
+        self.last_refresh.clone()
+    }
 }
 
 impl<S> Layer<S> for RefreshSystemLayer {
-    type Service = RefreshSystemService<S>;
+    type Service = RefreshSystem<S>;
 
     fn layer(&self, inner: S) -> Self::Service {
-        RefreshSystemService {
+        RefreshSystem {
             inner,
             system: self.system.clone(),
             refresh_rate: self.refresh_rate,
@@ -41,14 +45,14 @@ impl<S> Layer<S> for RefreshSystemLayer {
 }
 
 #[derive(Clone, Debug)]
-pub struct RefreshSystemService<S> {
+pub struct RefreshSystem<S> {
     inner: S,
     system: Arc<RwLock<System>>,
     refresh_rate: Duration,
-    last_refresh: Arc<Mutex<Option<Instant>>>,
+    last_refresh: Arc<RwLock<Option<DateTime<Local>>>>,
 }
 
-impl<ReqBody, S> Service<Request<ReqBody>> for RefreshSystemService<S>
+impl<ReqBody, S> Service<Request<ReqBody>> for RefreshSystem<S>
 where
     S: Service<Request<ReqBody>>,
     S::Future: Send + 'static,
@@ -68,20 +72,36 @@ where
         let inner = self.inner.call(req);
         async move {
             // Update system if needed
-            let mut last_refresh = last_refresh.lock().await;
-            let should_refresh = match *last_refresh {
-                None => true,
-                Some(last_refresh) => last_refresh.elapsed() > refresh_rate,
+            let needs_refresh = {
+                let guard = last_refresh.read().await;
+                should_refresh(*guard, refresh_rate).is_some()
             };
-            if should_refresh {
-                debug!(?last_refresh, "refreshing system");
-                *last_refresh = Some(Instant::now());
-                system.write().await.refresh_all();
+            if needs_refresh {
+                let mut guard = last_refresh.write().await;
+
+                // Check again because the lock was re-acquired
+                if let Some(now) = should_refresh(*guard, refresh_rate) {
+                    debug!(?last_refresh, "refreshing system");
+                    *guard = Some(now);
+                    system.write().await.refresh_all();
+                }
             }
 
             // Execute next service
             inner.await
         }
         .boxed()
+    }
+}
+
+fn should_refresh(
+    last_refresh: Option<DateTime<Local>>,
+    refresh_rate: Duration,
+) -> Option<DateTime<Local>> {
+    let now = Local::now();
+    match last_refresh {
+        None => Some(now),
+        Some(last_refresh) if now - last_refresh >= refresh_rate => Some(now),
+        _ => None,
     }
 }
