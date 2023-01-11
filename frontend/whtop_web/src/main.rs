@@ -4,5 +4,5 @@ mod layers;
 mod routes;
 
 fn main() {
-    yew::start_app::<components::App>();
+    yew::Renderer::<components::App>::new().render();
 }

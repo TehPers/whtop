@@ -6,23 +6,23 @@ use crate::{
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-fn switch(routes: &AppRoute) -> Html {
-    match routes {
-        AppRoute::Dashboard => html! {
-            <Dashboard />
-        },
-    }
-}
-
 #[function_component(App)]
 pub fn app() -> Html {
     html! {
         <WithContext>
-            <Navbar />
             <BrowserRouter>
-                <Switch<AppRoute> render={Switch::render(switch)} />
+                <Navbar />
+                <Switch<AppRoute> render={switch} />
             </BrowserRouter>
         </WithContext>
+    }
+}
+
+fn switch(routes: AppRoute) -> Html {
+    match routes {
+        AppRoute::Dashboard => html! {
+            <Dashboard />
+        },
     }
 }
 

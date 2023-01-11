@@ -7,9 +7,11 @@ publish = false
 [dependencies]
 # Common
 whtop_common = { path = "../../shared/whtop_common" }
+
 # Frontend
-yew = "0.19"
-yew-router = "0.16"
+yew = { version = "0.20", features = ["csr"] }
+yew-router = "0.17"
+yew-hooks = "0.2"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 gloo = "0.8"
@@ -24,13 +26,17 @@ web-sys = { version = "0.3", features = [
     "Response",
     "Window",
 ] }
+
 # Serialization
 serde = "1"
+
 # Futures
 futures = "0.3"
 pin-project = "1"
+
 # Requests
 tower = { version = "0.4", features = ["limit", "util"] }
+
 # Errors
 anyhow = "1"
 
