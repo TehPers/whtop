@@ -1,21 +1,20 @@
-use crate::routes::RouteResult;
-use axum::{body::HttpBody, response::IntoResponse, routing::MethodRouter, Extension, Json};
-use std::sync::Arc;
-use sysinfo::{Cpu, CpuExt, System, SystemExt};
-use tokio::sync::RwLock;
+use axum::{body::HttpBody, extract::State, response::IntoResponse, routing::MethodRouter, Json};
+use sysinfo::{Cpu, CpuExt, SystemExt};
 use whtop_common::models::api::{CpuInfo, GetCpuResponse, GlobalCpuInfo};
 
-pub fn cpu<B>() -> MethodRouter<B>
+use crate::routes::RouteResult;
+
+use super::SystemState;
+
+pub fn cpu<B>() -> MethodRouter<SystemState, B>
 where
     B: HttpBody + Send + 'static,
 {
     MethodRouter::new().get(get_cpu)
 }
 
-async fn get_cpu(
-    Extension(system): Extension<Arc<RwLock<System>>>,
-) -> RouteResult<impl IntoResponse> {
-    let system = system.read().await;
+async fn get_cpu(State(state): State<SystemState>) -> RouteResult<impl IntoResponse> {
+    let system = state.system.read().await;
     let global = create_global_cpu_info(system.global_cpu_info());
     let cpus = system.cpus().iter().map(create_cpu_info).collect();
     let response = GetCpuResponse { global, cpus };
@@ -39,8 +38,9 @@ fn create_global_cpu_info(cpu: &Cpu) -> GlobalCpuInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use axum::{body::Bytes, extract::Extension, http::StatusCode, response::IntoResponse};
+    use axum::{body::Bytes, http::StatusCode, response::IntoResponse};
     use std::sync::Arc;
+    use sysinfo::System;
     use tokio::sync::RwLock;
     use whtop_common::models::api::GetCpuResponse;
 
@@ -68,7 +68,7 @@ mod tests {
         let system = Arc::new(RwLock::new(system));
 
         // Execute
-        let response = get_cpu(Extension(system)).await.unwrap();
+        let response = get_cpu(State(SystemState { system })).await.unwrap();
 
         // Assert
         let (parts, body) = response.into_response().into_parts();

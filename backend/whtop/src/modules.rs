@@ -1,8 +1,9 @@
 use crate::{
     config::AppConfig,
     layers::{CacheControlLayer, CacheOptions, LastModifiedLayer, RefreshSystemLayer},
+    routes::api::system::SystemState,
 };
-use axum::{body::HttpBody, Extension, Router};
+use axum::{body::HttpBody, Router};
 use axum_extra::routing::SpaRouter;
 use chrono::{Duration, Local};
 use std::sync::Arc;
@@ -11,7 +12,7 @@ use tokio::sync::RwLock;
 use tower::ServiceBuilder;
 use tower_http::cors::{Any, CorsLayer};
 
-pub fn frontend<B>(config: Arc<AppConfig>) -> Router<B>
+pub fn frontend<B>(config: &AppConfig) -> Router<(), B>
 where
     B: HttpBody + Send + 'static,
 {
@@ -22,7 +23,7 @@ where
     }
 }
 
-pub fn system<B>(config: Arc<AppConfig>) -> Router<B>
+pub fn system<B>(config: &AppConfig) -> Router<(), B>
 where
     B: HttpBody + Send + 'static,
 {
@@ -57,16 +58,25 @@ where
     });
 
     // Build router
+    let state = SystemState { system };
     Router::new()
-        .route("/cpu", crate::routes::api::system::cpu())
-        .route("/memory", crate::routes::api::system::memory())
-        .route("/processes", crate::routes::api::system::processes())
+        .route(
+            "/cpu",
+            crate::routes::api::system::cpu().with_state(state.clone()),
+        )
+        .route(
+            "/memory",
+            crate::routes::api::system::memory().with_state(state.clone()),
+        )
+        .route(
+            "/processes",
+            crate::routes::api::system::processes().with_state(state),
+        )
         .layer(
             ServiceBuilder::new()
                 .layer(refresh_layer)
                 .layer(cors_layer)
                 .layer(cache_control_layer)
-                .layer(last_modified_layer)
-                .layer(Extension(system)),
+                .layer(last_modified_layer),
         )
 }

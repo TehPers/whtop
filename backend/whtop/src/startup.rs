@@ -1,7 +1,5 @@
-use crate::config::AppConfig;
 use anyhow::Context;
-use axum::{body::HttpBody, Extension, Router, Server};
-use std::sync::Arc;
+use axum::{body::HttpBody, Router, Server};
 use tower::ServiceBuilder;
 use tower_http::{
     compression::{predicate::SizeAbove, CompressionLayer},
@@ -9,6 +7,8 @@ use tower_http::{
 };
 use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+
+use crate::config::AppConfig;
 
 const DEFAULT_ENV_FILTER: &str = "info";
 
@@ -20,11 +20,11 @@ pub async fn start() -> anyhow::Result<()> {
         .try_init()?;
 
     // Load config
-    let config = Arc::new(load_config()?);
+    let config = load_config()?;
     debug!(?config, "config loaded");
 
-    // Create app;
-    let app = build_app(config.clone()).await?;
+    // Create app
+    let app = build_app(&config).await?;
     info!("listening on {}", config.address);
     Server::try_bind(&config.address)
         .context("error binding to address")?
@@ -39,15 +39,15 @@ fn load_config() -> anyhow::Result<AppConfig> {
         .context("error reading config")
 }
 
-async fn build_app<B>(config: Arc<AppConfig>) -> anyhow::Result<Router<B>>
+async fn build_app<B>(config: &AppConfig) -> anyhow::Result<Router<(), B>>
 where
     B: HttpBody + Send + 'static,
 {
     // Backend API
-    let api_router = Router::new().nest("/system", crate::modules::system(config.clone()));
+    let api_router = Router::new().nest("/system", crate::modules::system(config));
 
     // Frontend
-    let frontend_router = crate::modules::frontend(config.clone());
+    let frontend_router = crate::modules::frontend(config);
 
     // Global layers
     let router = Router::new()
@@ -56,8 +56,7 @@ where
         .layer(
             ServiceBuilder::new()
                 .layer(CompressionLayer::new().compress_when(SizeAbove::new(1000)))
-                .layer(TraceLayer::new_for_http())
-                .layer(Extension(config)),
+                .layer(TraceLayer::new_for_http()),
         );
 
     Ok(router)

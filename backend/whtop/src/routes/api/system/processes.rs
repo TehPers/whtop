@@ -1,21 +1,22 @@
-use crate::routes::RouteResult;
-use axum::{body::HttpBody, response::IntoResponse, routing::MethodRouter, Extension, Json};
-use std::{cmp::Reverse, sync::Arc};
+use std::cmp::Reverse;
+
+use axum::{body::HttpBody, extract::State, response::IntoResponse, routing::MethodRouter, Json};
 use sysinfo::{Pid, Process, ProcessExt, System, SystemExt};
-use tokio::sync::RwLock;
 use whtop_common::models::api::{GetProcessesResponse, ProcessInfo};
 
-pub fn processes<B>() -> MethodRouter<B>
+use crate::routes::RouteResult;
+
+use super::SystemState;
+
+pub fn processes<B>() -> MethodRouter<SystemState, B>
 where
     B: HttpBody + Send + 'static,
 {
     MethodRouter::new().get(get_processes)
 }
 
-async fn get_processes(
-    Extension(system): Extension<Arc<RwLock<System>>>,
-) -> RouteResult<impl IntoResponse> {
-    let system = system.read().await;
+async fn get_processes(State(state): State<SystemState>) -> RouteResult<impl IntoResponse> {
+    let system = state.system.read().await;
     let response: GetProcessesResponse = create_response(&system);
     Ok(Json(response))
 }
