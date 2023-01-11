@@ -1,14 +1,14 @@
 use axum::http::{Request, Response};
-use futures::ready;
 use pin_project_lite::pin_project;
 use std::{
     fmt::{Display, Formatter},
     future::Future,
     pin::Pin,
-    task::{Context, Poll},
+    task::{ready, Context, Poll},
 };
 use tower::{Layer, Service};
 
+/// Options for the `cache-control` header.
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct CacheOptions {
     /// The response cannot be stored (`no-store`).
@@ -131,6 +131,7 @@ impl Display for CacheOptions {
     }
 }
 
+/// Applies the `cache-control` header to outgoing responses.
 #[derive(Clone, Debug)]
 pub struct CacheControlLayer {
     options: CacheOptions,
@@ -153,6 +154,7 @@ impl<S> Layer<S> for CacheControlLayer {
     }
 }
 
+/// Applies the `cache-control` header to the outgoing response.
 #[derive(Clone, Debug)]
 pub struct CacheControl<S> {
     inner: S,
@@ -181,6 +183,7 @@ where
 }
 
 pin_project! {
+    /// Response future for [`CacheControl`].
     #[derive(Clone, Debug)]
     pub struct ResponseFuture<F> {
         #[pin]

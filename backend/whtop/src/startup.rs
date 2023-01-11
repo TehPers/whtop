@@ -1,6 +1,6 @@
 use crate::config::AppConfig;
 use anyhow::Context;
-use axum::{body::HttpBody, Extension, Router};
+use axum::{body::HttpBody, Extension, Router, Server};
 use std::sync::Arc;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -26,7 +26,7 @@ pub async fn start() -> anyhow::Result<()> {
     // Create app;
     let app = build_app(config.clone()).await?;
     info!("listening on {}", config.address);
-    axum::Server::try_bind(&config.address)
+    Server::try_bind(&config.address)
         .context("error binding to address")?
         .serve(app.into_make_service())
         .await
